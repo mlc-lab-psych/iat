@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alive Experiment</title>
+    <script src="https://unpkg.com/jspsych@8.0.0"></script>
+    <link href="https://unpkg.com/jspsych@8.0.0/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-categorize-image@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-html-form@1.0.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-iat-html@1.1.3"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@1.0.1/css/survey.css">
+    <script src="https://unpkg.com/@jspsych/plugin-iat-image@1.1.3"></script>
+
+
+    <script>
+        console.warn = () => {};
+        let test_stimuli;
+        let images;
+
+        async function preload_images(data){
+            let preloadedImages = []
+            data.forEach(img=>{
+                let ogImg = new Image();
+                ogImg.src = img;
+                preloadedImages.push(ogImg)
+            })
+            return preloadedImages
+        }
+
+        async function fetchData() {
+            try {
+                // const response = await fetch('https://alive-4.vercel.app/get-data'); // Make the GET request
+                const response = await fetch('http://localhost:3000/get-data'); // Make the GET request
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json(); // Parse the JSON response
+                test_stimuli = data['test_stimuli']
+                images = data['images']
+                await preload_images(images).then((result)=>{
+                    images = result
+                })
+                initializeJsPsych()
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function initializeJsPsych(){
+            const jsPsych = initJsPsych();
+
+            function getParamFromURL(name) {
+                name = name.replace(/\[/, "\\[").replace(/]/, "\\]");
+                let regex = new RegExp("[?&]" + name + "=([^&#]*)");
+                let results = regex.exec(window.location.href);
+                try{
+                    let decoded = decodeURIComponent(results[1])
+                    return results ? decoded : "";
+                }
+                catch(error){
+                    return ""
+                }
+            }
+
+            let subject_id = "alive_images_" + Math.floor(Math.random() * 1000000);
+            let worker_id = getParamFromURL('PROLIFIC_PID') || subject_id;
+            let study_id = getParamFromURL('STUDY_ID') || "NULL";
+            let session_id = getParamFromURL('SESSION_ID') || "NULL";
+
+            // Record subject info in the jsPsych data
+            jsPsych.data.addProperties({
+                subject: subject_id,
+                worker_id: worker_id,
+                study_id: study_id,
+                session_id: session_id
+            });
+
+            let timeline = []
+
+            const welcome_block = {
+                type: jsPsychHtmlKeyboardResponse,
+                version:"",
+                stimulus: "<p>Welcome to the experiment.</p><p>Press any key to begin.</p>"
+            };
+
+            timeline.push(welcome_block)
+
+            const test = {
+                type: jsPsychIatImage,
+                stimulus: jsPsych.timelineVariable('stimulus'),
+                stim_key_association: jsPsych.timelineVariable('association'),
+                html_when_wrong: '<span style="color: red; font-size: 80px">X</span>',
+                bottom_instructions: '<p>If you press the wrong key, a red X will appear. Press the other key to continue</p>',
+                force_correct_key_press: true,
+                display_feedback: true,
+                left_category_key: 'd',
+                right_category_key: 'k',
+                left_category_label: ['AWARE', 'MOVING'],
+                right_category_label: ['INERT','STATIONARY'],
+                response_ends_trial: true
+            };
+
+            const test_procedure = {
+                timeline: [test],
+                timeline_variables: test_stimuli
+            };
+
+            timeline.push(test_procedure);
+
+            const comment_block = {
+                type: jsPsychSurvey,
+                survey_json: {
+                    showQuestionNumbers: false,
+                    elements:
+                        [
+                            {
+                                type: 'text',
+                                title: "Do you have any comments about the study?",
+                                name: 'comments',
+                                placeholder: 'Comments here',
+                                columns: 80,
+                                isRequired: true
+                            },
+                            {
+                                type: 'radiogroup',
+                                title: "Did you experience any technical difficulties with this task?",
+                                name: 'technical_difficulties',
+                                choices: ["Yes", "No"],
+                                isRequired: true
+                            },
+                            {
+                                type: 'text',
+                                title: "If yes, please describe your experience.",
+                                name: 'difficulty_description',
+                                placeholder: 'Describe any technical difficulties',
+                                required: false
+                            }
+
+                        ]},
+                on_finish: function(data) {
+                    sendResults(jsPsych.data.get()['trials']);
+                }
+            };
+
+            timeline.push(comment_block);
+
+            const end_block = {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: '<p>Thanks for participating!</p>',
+                choices: "NO_KEYS",
+            };
+            timeline.push(end_block);
+
+            jsPsych.run({timeline: timeline, preload_images: images})
+        }
+
+        async function sendResults(results) {
+            try {
+                const response = await fetch('http://localhost:3000/submit-results', {
+                // const response = await fetch('https://alive-4.vercel.app/submit-results', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(results) // Send results as JSON
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json(); // Parse the JSON response
+                console.log(result.message); // Log success message
+            } catch (error) {
+                console.error('Error sending results:', error);
+            }
+        }
+
+        window.onload = function() {
+            fetchData();
+        }
+
+
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>
