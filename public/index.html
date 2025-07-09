@@ -33,13 +33,31 @@
 
         async function fetchData() {
             try {
-                const response = await fetch('https://iat-mu.vercel.app/'); // Make the GET request
-                // const response = await fetch('http://localhost:3000/get-data'); // Make the GET request
+                // const response = await fetch('https://iat-mu.vercel.app/'); // Make the GET request
+                const response = await fetch('http://localhost:3000/get-data'); // Make the GET request
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json(); // Parse the JSON response
-                test_stimuli = data['test_stimuli']
+
+                let current_block = 1
+                let test_block_stimuli = []
+                let temp_block = []
+
+                for(let i=0; i < data['test_stimuli'].length; i++){
+                    if(data['test_stimuli'][i]['block'] === current_block){
+                        temp_block.push(data['test_stimuli'][i])
+                    }
+                    else{
+                        test_block_stimuli.push(temp_block)
+                        current_block += 1
+                        temp_block = [data['test_stimuli'][i]]
+                    }
+                }
+
+                test_block_stimuli.push(temp_block)
+
+                test_stimuli = test_block_stimuli
                 images = data['images']
                 await preload_images(images).then((result)=>{
                     images = result
@@ -80,6 +98,7 @@
             });
 
             let timeline = []
+            let instructions = []
 
             const welcome_block = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -107,7 +126,7 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_1)
+            instructions.push(block_1)
 
             const block_2 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -119,7 +138,7 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_2)
+            instructions.push(block_2)
 
             const block_3 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -131,7 +150,7 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_3)
+            instructions.push(block_3)
 
             const block_4 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -143,7 +162,7 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_4)
+            instructions.push(block_4)
 
             const block_5 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -155,7 +174,7 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_5)
+            instructions.push(block_5)
 
             const block_6 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -167,7 +186,7 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_6)
+            instructions.push(block_6)
 
             const block_7 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -179,12 +198,12 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_7)
+            instructions.push(block_7)
 
 
             const test = {
-                type: jsPsychIatImage,
-                stimulus: jsPsych.timelineVariable('stimulus'),
+                type: jsPsychIatHtml,
+                stimulus: function() {},
                 stim_key_association: jsPsych.timelineVariable('association'),
                 html_when_wrong: '<span style="color: red; font-size: 80px">X</span>',
                 bottom_instructions: '<p>If you press the wrong key, a red X will appear. Press the other key to continue</p>',
@@ -197,14 +216,18 @@
                 response_ends_trial: true
             };
 
-            const test_procedure = {
-                timeline: [test],
-                timeline_variables: test_stimuli
-            };
+            for (let i = 0; i < test_stimuli.length; i++) {
+                timeline.push(instructions[i]);
 
-            timeline.push(test_procedure);
+                let test_procedure = {
+                    timeline: [test],
+                    timeline_variables: test_stimuli[i]
+                };
 
-            const comment_block = {
+                timeline.push(test_procedure);
+            }
+
+                const comment_block = {
                 type: jsPsychSurvey,
                 survey_json: {
                     showQuestionNumbers: false,
@@ -253,8 +276,8 @@
 
         async function sendResults(results) {
             try {
-                // const response = await fetch('http://localhost:3000/submit-results', {
-                const response = await fetch('https://iat-mu.vercel.app/submit-results', {
+                const response = await fetch('http://localhost:3000/submit-results', {
+                // const response = await fetch('https://iat-mu.vercel.app/submit-results', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
