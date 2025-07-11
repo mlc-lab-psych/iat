@@ -39,12 +39,42 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json(); // Parse the JSON response
-                test_stimuli = data['test_stimuli']
+
+                let current_block = 0
+                let test_block_stimuli = []
+                let temp_block = []
+
+                for(let i = 0; i < data['test_stimuli'].length; i++){
+                    if(data['test_stimuli'][i]['block'] === current_block){
+                        temp_block.push(data['test_stimuli'][i])
+                        if(data['test_stimuli'][i]['stimulus_type'] === "image"){
+                            const image_url = data['test_stimuli'][i]['stimulus'];
+                            data['test_stimuli'][i]['stimulus'] = `<img src="${image_url}"  alt=""/>`;
+                        }
+                    }
+                    else{
+                        test_block_stimuli.push(temp_block)
+                        current_block += 1
+                        temp_block = [data['test_stimuli'][i]]
+                        if(data['test_stimuli'][i]['stimulus_type'] === "image"){
+                            const image_url = data['test_stimuli'][i]['stimulus'];
+                            data['test_stimuli'][i]['stimulus'] = `<img src="${image_url}"  alt=""/>`;
+                        }
+                    }
+                }
+
+                test_block_stimuli.push(temp_block)
+
+                console.log(test_block_stimuli)
+
                 images = data['images']
-                await preload_images(images).then((result)=>{
+                await preload_images(images).then((result) => {
                     images = result
                 })
-                initializeJsPsych()
+
+                test_stimuli = test_block_stimuli;
+                initializeJsPsych();
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -80,6 +110,7 @@
             });
 
             let timeline = []
+            let instructions = []
 
             const welcome_block = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -92,10 +123,10 @@
             const block_0 = {
                 type: jsPsychHtmlKeyboardResponse,
                 version:"",
-                stimulus: "<p>In this study you will complete an Implicit Association Test (IAT) in which you will be asked to sort words and pictures into groups as fast as you can. You will sort words into categories that don’t have names in English - we will just call them ‘Category 1 Words’ and ‘Category 2 Words’. You will start by practicing sorting words into Categories 1 and 2 to learn which words go in which category. </p>"
+                stimulus: "<p>In this study you will complete an Implicit Association Test (IAT) in which you will be asked to sort words and pictures into groups as fast as you can.<br/><br/> You will sort words into categories that don’t have names in English - we will just call them ‘Category 1 Words’ and ‘Category 2 Words’. <br/><br/>You will start by practicing sorting words into Categories 1 and 2 to learn which words go in which category. </p>"
             };
 
-            timeline.push(block_0)
+            instructions.push(block_0)
 
             const block_1 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -107,7 +138,7 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_1)
+            instructions.push(block_1)
 
             const block_2 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -119,7 +150,7 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_2)
+            instructions.push(block_2)
 
             const block_3 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -131,7 +162,7 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_3)
+            instructions.push(block_3)
 
             const block_4 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -143,7 +174,7 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_4)
+            instructions.push(block_4)
 
             const block_5 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -155,54 +186,266 @@
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_5)
+            instructions.push(block_5)
 
             const block_6 = {
                 type: jsPsychHtmlKeyboardResponse,
                 version:"",
-                stimulus: "<p>Use the E key for ‘Animals’ and for <b>Category 1 Words</b>. <br/><br/>" +
-                    "Use the I key for ‘Artifacts’ and for <b>Category 2 Words</b>. <br/><br/>" +
+                stimulus: "<p>Use the E key for ‘Artifacts’ and for <b>Category 2 Words</b>. <br/><br/>" +
+                    "Use the I key for ‘Animals’ and for <b>Category 1 Words</b>. <br/><br/>" +
                     "Each item belongs to only one category. <br/><br/>" +
                     "If you make a mistake, a red X will appear. Press the other key to continue. Go as fast as you can while being accurate. <br/><br/><br/><br/>" +
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_6)
+            instructions.push(block_6)
 
             const block_7 = {
                 type: jsPsychHtmlKeyboardResponse,
                 version:"",
-                stimulus: "<p>Use the E key for ‘Animals’ and for <b>Category 1 Words</b>. <br/><br/>" +
-                    "Use the I key for ‘Artifacts’ and for <b>Category 2 Words</b>. <br/><br/>" +
+                stimulus: "<p>Use the E key for ‘Artifacts’ and for <b>Category 2 Words</b>. <br/><br/>" +
+                    "Use the I key for ‘Animals’ and for <b>Category 1 Words</b>. <br/><br/>" +
                     "Each item belongs to only one category. <br/><br/>" +
                     "If you make a mistake, a red X will appear. Press the other key to continue. Go as fast as you can while being accurate. <br/><br/><br/><br/>" +
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
 
-            timeline.push(block_7)
+            instructions.push(block_7)
 
-
-            const test = {
-                type: jsPsychIatImage,
-                stimulus: jsPsych.timelineVariable('stimulus'),
+            const test_1 = {
+                type: jsPsychIatHtml,
                 stim_key_association: jsPsych.timelineVariable('association'),
                 html_when_wrong: '<span style="color: red; font-size: 80px">X</span>',
                 bottom_instructions: '<p>If you press the wrong key, a red X will appear. Press the other key to continue</p>',
+                stimulus: jsPsych.timelineVariable('stimulus'),
+                stimulus_duration: 1000,
                 force_correct_key_press: true,
                 display_feedback: true,
-                left_category_key: 'd',
-                right_category_key: 'k',
-                left_category_label: ['AWARE', 'MOVING'],
-                right_category_label: ['INERT','STATIONARY'],
-                response_ends_trial: true
+                trial_duration: 3000, //Only if display_feedback is false
+                left_category_key: 'e',
+                right_category_key: 'i',
+                left_category_label: ['ANIMATE'],
+                right_category_label: ['INANIMATE'],
+                response_ends_trial: true,
+                data:{
+                    trial:jsPsych.timelineVariable('trial'),
+                    block:jsPsych.timelineVariable('block'),
+                    trial_type_airtable:jsPsych.timelineVariable('trial_type'),
+                    stimulus_type:jsPsych.timelineVariable('stimulus_type'),
+                    item:jsPsych.timelineVariable('item'),
+                    category:jsPsych.timelineVariable('category'),
+                    category_display:jsPsych.timelineVariable('category_display'),
+                    stimulus:jsPsych.timelineVariable('stimulus'),
+                    correct_key:jsPsych.timelineVariable('correct_key')
+                }
             };
 
-            const test_procedure = {
-                timeline: [test],
-                timeline_variables: test_stimuli
+            const test_2 = {
+                type: jsPsychIatHtml,
+                stim_key_association: jsPsych.timelineVariable('association'),
+                html_when_wrong: '<span style="color: red; font-size: 80px">X</span>',
+                bottom_instructions: '<p>If you press the wrong key, a red X will appear. Press the other key to continue</p>',
+                stimulus: jsPsych.timelineVariable('stimulus'),
+                stimulus_duration: 1000,
+                force_correct_key_press: true,
+                display_feedback: true,
+                trial_duration: 3000, //Only if display_feedback is false
+                left_category_key: 'e',
+                right_category_key: 'i',
+                left_category_label: ['ANIMAL'],
+                right_category_label: ['ARTIFACT'],
+                response_ends_trial: true,
+                data:{
+                    trial:jsPsych.timelineVariable('trial'),
+                    block:jsPsych.timelineVariable('block'),
+                    trial_type_airtable:jsPsych.timelineVariable('trial_type'),
+                    stimulus_type:jsPsych.timelineVariable('stimulus_type'),
+                    item:jsPsych.timelineVariable('item'),
+                    category:jsPsych.timelineVariable('category'),
+                    category_display:jsPsych.timelineVariable('category_display'),
+                    stimulus:jsPsych.timelineVariable('stimulus'),
+                    correct_key:jsPsych.timelineVariable('correct_key')
+                }
             };
 
-            timeline.push(test_procedure);
+            const test_3 = {
+                type: jsPsychIatHtml,
+                stim_key_association: jsPsych.timelineVariable('association'),
+                html_when_wrong: '<span style="color: red; font-size: 80px">X</span>',
+                bottom_instructions: '<p>If you press the wrong key, a red X will appear. Press the other key to continue</p>',
+                stimulus: jsPsych.timelineVariable('stimulus'),
+                stimulus_duration: 1000,
+                force_correct_key_press: true,
+                display_feedback: true,
+                trial_duration: 3000, //Only if display_feedback is false
+                left_category_key: 'e',
+                right_category_key: 'i',
+                left_category_label: ['ANIMATE'],
+                right_category_label: ['INANIMATE'],
+                response_ends_trial: true,
+                data:{
+                    trial:jsPsych.timelineVariable('trial'),
+                    block:jsPsych.timelineVariable('block'),
+                    trial_type_airtable:jsPsych.timelineVariable('trial_type'),
+                    stimulus_type:jsPsych.timelineVariable('stimulus_type'),
+                    item:jsPsych.timelineVariable('item'),
+                    category:jsPsych.timelineVariable('category'),
+                    category_display:jsPsych.timelineVariable('category_display'),
+                    stimulus:jsPsych.timelineVariable('stimulus'),
+                    correct_key:jsPsych.timelineVariable('correct_key')
+                }
+            };
+
+            const test_4 = {
+                type: jsPsychIatHtml,
+                stim_key_association: jsPsych.timelineVariable('association'),
+                html_when_wrong: '<span style="color: red; font-size: 80px">X</span>',
+                bottom_instructions: '<p>If you press the wrong key, a red X will appear. Press the other key to continue</p>',
+                stimulus: jsPsych.timelineVariable('stimulus'),
+                stimulus_duration: 1000,
+                force_correct_key_press: true,
+                display_feedback: true,
+                trial_duration: 3000, //Only if display_feedback is false
+                left_category_key: 'e',
+                right_category_key: 'i',
+                left_category_label: ['ANIMATE','ANIMAL'],
+                right_category_label: ['INANIMATE','ARTIFACT'],
+                response_ends_trial: true,
+                data:{
+                    trial:jsPsych.timelineVariable('trial'),
+                    block:jsPsych.timelineVariable('block'),
+                    trial_type_airtable:jsPsych.timelineVariable('trial_type'),
+                    stimulus_type:jsPsych.timelineVariable('stimulus_type'),
+                    item:jsPsych.timelineVariable('item'),
+                    category:jsPsych.timelineVariable('category'),
+                    category_display:jsPsych.timelineVariable('category_display'),
+                    stimulus:jsPsych.timelineVariable('stimulus'),
+                    correct_key:jsPsych.timelineVariable('correct_key')
+                }
+            };
+
+            const test_5 = {
+                type: jsPsychIatHtml,
+                stim_key_association: jsPsych.timelineVariable('association'),
+                html_when_wrong: '<span style="color: red; font-size: 80px">X</span>',
+                bottom_instructions: '<p>If you press the wrong key, a red X will appear. Press the other key to continue</p>',
+                stimulus: jsPsych.timelineVariable('stimulus'),
+                stimulus_duration: 1000,
+                force_correct_key_press: true,
+                display_feedback: true,
+                trial_duration: 3000, //Only if display_feedback is false
+                left_category_key: 'e',
+                right_category_key: 'i',
+                left_category_label: ['INANIMATE','ARTIFACT'],
+                right_category_label: ['ANIMATE','ANIMAL'],
+                response_ends_trial: true,
+                data:{
+                    trial:jsPsych.timelineVariable('trial'),
+                    block:jsPsych.timelineVariable('block'),
+                    trial_type_airtable:jsPsych.timelineVariable('trial_type'),
+                    stimulus_type:jsPsych.timelineVariable('stimulus_type'),
+                    item:jsPsych.timelineVariable('item'),
+                    category:jsPsych.timelineVariable('category'),
+                    category_display:jsPsych.timelineVariable('category_display'),
+                    stimulus:jsPsych.timelineVariable('stimulus'),
+                    correct_key:jsPsych.timelineVariable('correct_key')
+                }
+            };
+
+            const test_6 = {
+                type: jsPsychIatHtml,
+                stim_key_association: jsPsych.timelineVariable('association'),
+                html_when_wrong: '<span style="color: red; font-size: 80px">X</span>',
+                bottom_instructions: '<p>If you press the wrong key, a red X will appear. Press the other key to continue</p>',
+                stimulus: jsPsych.timelineVariable('stimulus'),
+                stimulus_duration: 1000,
+                force_correct_key_press: true,
+                display_feedback: true,
+                trial_duration: 3000, //Only if display_feedback is false
+                left_category_key: 'e',
+                right_category_key: 'i',
+                left_category_label: ['ANIMATE','ANIMAL'],
+                right_category_label: ['INANIMATE','ARTIFACT'],
+                response_ends_trial: true,
+                data:{
+                    trial:jsPsych.timelineVariable('trial'),
+                    block:jsPsych.timelineVariable('block'),
+                    trial_type_airtable:jsPsych.timelineVariable('trial_type'),
+                    stimulus_type:jsPsych.timelineVariable('stimulus_type'),
+                    item:jsPsych.timelineVariable('item'),
+                    category:jsPsych.timelineVariable('category'),
+                    category_display:jsPsych.timelineVariable('category_display'),
+                    stimulus:jsPsych.timelineVariable('stimulus'),
+                    correct_key:jsPsych.timelineVariable('correct_key')
+                }
+            };
+
+            const test_7 = {
+                type: jsPsychIatHtml,
+                stim_key_association: jsPsych.timelineVariable('association'),
+                html_when_wrong: '<span style="color: red; font-size: 80px">X</span>',
+                bottom_instructions: '<p>If you press the wrong key, a red X will appear. Press the other key to continue</p>',
+                stimulus: jsPsych.timelineVariable('stimulus'),
+                stimulus_duration: 1000,
+                force_correct_key_press: true,
+                display_feedback: true,
+                trial_duration: 3000, //Only if display_feedback is false
+                left_category_key: 'e',
+                right_category_key: 'i',
+                left_category_label: ['INANIMATE','ARTIFACT'],
+                right_category_label: ['ANIMATE','ANIMAL'],
+                response_ends_trial: true,
+                data:{
+                    trial:jsPsych.timelineVariable('trial'),
+                    block:jsPsych.timelineVariable('block'),
+                    trial_type_airtable:jsPsych.timelineVariable('trial_type'),
+                    stimulus_type:jsPsych.timelineVariable('stimulus_type'),
+                    item:jsPsych.timelineVariable('item'),
+                    category:jsPsych.timelineVariable('category'),
+                    category_display:jsPsych.timelineVariable('category_display'),
+                    stimulus:jsPsych.timelineVariable('stimulus'),
+                    correct_key:jsPsych.timelineVariable('correct_key')
+                }
+            };
+
+            const test_8 = {
+                type: jsPsychIatHtml,
+                stim_key_association: jsPsych.timelineVariable('association'),
+                html_when_wrong: '<span style="color: red; font-size: 80px">X</span>',
+                bottom_instructions: '<p>If you press the wrong key, a red X will appear. Press the other key to continue</p>',
+                stimulus: jsPsych.timelineVariable('stimulus'),
+                stimulus_duration: 1000,
+                force_correct_key_press: true,
+                display_feedback: true,
+                trial_duration: 3000, //Only if display_feedback is false
+                left_category_key: 'e',
+                right_category_key: 'i',
+                left_category_label: ['INANIMATE','ARTIFACT'],
+                right_category_label: ['ANIMATE','ANIMAL'],
+                response_ends_trial: true,
+                data:{
+                    trial:jsPsych.timelineVariable('trial'),
+                    block:jsPsych.timelineVariable('block'),
+                    trial_type_airtable:jsPsych.timelineVariable('trial_type'),
+                    stimulus_type:jsPsych.timelineVariable('stimulus_type'),
+                    item:jsPsych.timelineVariable('item'),
+                    category:jsPsych.timelineVariable('category'),
+                    category_display:jsPsych.timelineVariable('category_display'),
+                    stimulus:jsPsych.timelineVariable('stimulus'),
+                    correct_key:jsPsych.timelineVariable('correct_key')
+                }
+            };
+
+            const tests = [test_1,test_2,test_3,test_4,test_5,test_6,test_7,test_8]
+
+            for (let i = 0; i < test_stimuli.length; i++) {
+                timeline.push(instructions[i]);
+                let test_procedure = {
+                    timeline: [tests[i]],
+                    timeline_variables: test_stimuli[i]
+                };
+                timeline.push(test_procedure);
+            }
 
             const comment_block = {
                 type: jsPsychSurvey,
@@ -246,6 +489,7 @@
                 stimulus: '<p>Thanks for participating!</p>',
                 choices: "NO_KEYS",
             };
+
             timeline.push(end_block);
 
             jsPsych.run({timeline: timeline, preload_images: images})
@@ -280,6 +524,28 @@
 
 
     </script>
+    <style>
+        #jspsych-iat-stim{
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        #jspsych-iat-stim img{
+            transform: translateY(-25%);
+        }
+
+        #trial_left_align{
+            left:28% !important;
+        }
+
+        #trial_right_align{
+            right: 28% !important;
+        }
+
+        #wrongImgContainer{
+            top:-535px !important;
+        }
+    </style>
 </head>
 <body>
 

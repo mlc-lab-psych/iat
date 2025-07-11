@@ -82,6 +82,27 @@ app.get('/get-data', (req, res) => {
             case "table_one":
                 tableAirtable = process.env.AIRTABLE_ALIVE_TABLE_1
                 break;
+            case "table_two":
+                tableAirtable = process.env.AIRTABLE_ALIVE_TABLE_2
+                break;
+            case "table_three":
+                tableAirtable = process.env.AIRTABLE_ALIVE_TABLE_3
+                break;
+            case "table_four":
+                tableAirtable = process.env.AIRTABLE_ALIVE_TABLE_4
+                break;
+            case "table_five":
+                tableAirtable = process.env.AIRTABLE_ALIVE_TABLE_5
+                break;
+            case "table_six":
+                tableAirtable = process.env.AIRTABLE_ALIVE_TABLE_6
+                break;
+            case "table_seven":
+                tableAirtable = process.env.AIRTABLE_ALIVE_TABLE_7
+                break;
+            case "table_eight":
+                tableAirtable = process.env.AIRTABLE_ALIVE_TABLE_8
+                break;
             default:
                 tableAirtable = process.env.AIRTABLE_ALIVE_TABLE_1
         }
@@ -137,7 +158,7 @@ app.get('/get-data', (req, res) => {
         data.then((result) =>{
             const sortedData = result.sort((a, b) => a.fields["trial"] - b.fields["trial"]);
             for(let rows in result){
-                if(result[rows].fields['trial_type'] === "target"){
+                if(result[rows].fields['stimulus_type'] === "image"){
                     images.push(result[rows].fields["stimulus"]);
                 }
 
