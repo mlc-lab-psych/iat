@@ -45,6 +45,16 @@ app.get('/get-data', (req, res) => {
 
     let images = [];
     let test_stimuli = [];
+    let category_display = {
+        0: [[], []],
+        1: [[], []],
+        2: [[], []],
+        3: [[], []],
+        4: [[], []],
+        5: [[], []],
+        6: [[], []],
+        7: [[], []]
+    }
 
     async function processCountData() {
         const dbRef = ref(database);
@@ -158,6 +168,7 @@ app.get('/get-data', (req, res) => {
         data.then((result) =>{
             const sortedData = result.sort((a, b) => a.fields["trial"] - b.fields["trial"]);
             for(let rows in result){
+
                 if(result[rows].fields['stimulus_type'] === "image"){
                     images.push(result[rows].fields["stimulus"]);
                 }
@@ -168,13 +179,28 @@ app.get('/get-data', (req, res) => {
                 else{
                     result[rows].fields["association"] = "right"
                 }
-
                 test_stimuli.push(result[rows].fields)
+
+                const fields = result[rows].fields;
+
+                const block = fields['block'];
+                const category = fields['category_display'];
+
+                if (fields['association'] === "left") {
+                    if (!category_display[block][0].includes(category)) {
+                        category_display[block][0].push(category);
+                    }
+                } else {
+                    if (!category_display[block][1].includes(category)) {
+                        category_display[block][1].push(category);
+                    }
+                }
             }
         }).then((dataset) =>{
             res.status(200).json({
                 test_stimuli: test_stimuli,
-                images: images
+                images: images,
+                category_display: category_display
             })
         })
     })

@@ -20,6 +20,9 @@
         console.warn = () => {};
         let test_stimuli;
         let images;
+        let category_displays;
+        let cat1_img = 'words_animate_Cat1.PNG'
+        let cat2_img = 'words_animate_Cat2.PNG'
 
         async function preload_images(data){
             let preloadedImages = []
@@ -73,6 +76,10 @@
                 })
 
                 test_stimuli = test_block_stimuli;
+                category_displays = data['category_display']
+
+                console.log(category_displays)
+
                 initializeJsPsych();
 
             } catch (error) {
@@ -122,17 +129,20 @@
 
             const block_0 = {
                 type: jsPsychHtmlKeyboardResponse,
-                version:"",
-                stimulus: "<p>In this study you will complete an Implicit Association Test (IAT) in which you will be asked to sort words and pictures into groups as fast as you can.<br/><br/> You will sort words into categories that don’t have names in English - we will just call them ‘Category 1 Words’ and ‘Category 2 Words’. <br/><br/>You will start by practicing sorting words into Categories 1 and 2 to learn which words go in which category. </p>"
+                choices: [" "],
+                stimulus: `<img src='${ category_displays[0][0][0] === "Category 1 words" ? cat1_img : cat2_img }' style='max-width: 600px;' alt=""/> ` +
+                    "<p>In this study you will complete an Implicit Association Test (IAT) in which you will be asked to sort words and pictures into groups as fast as you can.<br/><br/> You will sort words into categories that don’t have names in English - we will just call them ‘Category 1 Words’ and ‘Category 2 Words’. <br/><br/>You will start by practicing sorting words into Categories 1 and 2 to learn which words go in which category. <br/><br/><br/><br/>" +
+                    "Press the <b>space bar</b> when you are ready to start.</p>"
             };
 
             instructions.push(block_0)
 
             const block_1 = {
                 type: jsPsychHtmlKeyboardResponse,
-                version:"",
-                stimulus: "<p>Put a left finger on the E key for items that belong to the category <b>Animals</b>. <br/><br/>" +
-                    "Put a right finger on the I key for items that belong to the category <b>Artifacts</b>. <br/><br/>" +
+                choices: [" "],
+                stimulus: "<img src='images.PNG' style='max-width: 600px;' alt=''/>" +
+                    `<p>Put a left finger on the D key for items that belong to the category <b>${category_displays[1][0]}</b>. <br/><br/>` +
+                    `Put a right finger on the K key for items that belong to the category <b>${category_displays[1][1]}</b>. <br/><br/>` +
                     "Items will appear one at a time. <br/><br/>" +
                     "If you make a mistake, a red X will appear. Press the other key to continue. Go as fast as you can while being accurate. <br/><br/><br/><br/>" +
                     "Press the <b>space bar</b> when you are ready to start.</p>"
@@ -142,9 +152,10 @@
 
             const block_2 = {
                 type: jsPsychHtmlKeyboardResponse,
-                version:"",
-                stimulus: "<p>Put a left finger on the E key for items that belong to the category <b>Category 1 Words</b>. <br/><br/>" +
-                    "Put a right finger on the I key for items that belong to the category <b>Category 2 Words</b>. <br/><br/>" +
+                choices: [" "],
+                stimulus:`<img src='${category_displays[0][0][0] === "Category 1 words" ? cat1_img  : cat2_img}' style='max-width: 600px;' alt="">` +
+                    `<p>Put a left finger on the D key for items that belong to the category <b>${category_displays[2][0]}</b>. <br/><br/>` +
+                    `Put a right finger on the K key for items that belong to the category <b>${category_displays[2][1]}</b>. <br/><br/>` +
                     "Items will appear one at a time. <br/><br/>" +
                     "If you make a mistake, a red X will appear. Press the other key to continue. Go as fast as you can while being accurate. <br/><br/><br/><br/>" +
                     "Press the <b>space bar</b> when you are ready to start.</p>"
@@ -154,9 +165,9 @@
 
             const block_3 = {
                 type: jsPsychHtmlKeyboardResponse,
-                version:"",
-                stimulus: "<p>Use the E key for ‘Animals’ and for <b>Category 1 Words</b>. <br/><br/>" +
-                    "Use the I key for ‘Artifacts’ and for <b>Category 2 Words</b>. <br/><br/>" +
+                choices: [" "],
+                stimulus: `<p>Use the D key for <b>${category_displays[3][0][0]}</b> and for <b>${category_displays[3][0][1]}</b>. <br/><br/>` +
+                    `Use the K key for <b>${category_displays[3][1][0]}</b>’ and for <b>${category_displays[3][1][1]}</b>. <br/><br/>` +
                     "Each item belongs to only one category. <br/><br/>" +
                     "If you make a mistake, a red X will appear. Press the other key to continue. Go as fast as you can while being accurate. <br/><br/><br/><br/>" +
                     "Press the <b>space bar</b> when you are ready to start.</p>"
@@ -166,9 +177,9 @@
 
             const block_4 = {
                 type: jsPsychHtmlKeyboardResponse,
-                version:"",
-                stimulus: "<p>Use the E key for ‘Animals’ and for <b>Category 1 Words</b>. <br/><br/>" +
-                    "Use the I key for ‘Artifacts’ and for <b>Category 2 Words</b>. <br/><br/>" +
+                choices: [" "],
+                stimulus: `<p>Use the D key for <b>${category_displays[4][0][0]}</b> and for <b>${category_displays[4][0][1]}</b>. <br/><br/>`+
+                    `Use the K key for <b>${category_displays[4][1][0]}</b> and for <b>${category_displays[4][1][1]}</b>. <br/><br/>` +
                     "Each item belongs to only one category. <br/><br/>" +
                     "If you make a mistake, a red X will appear. Press the other key to continue. Go as fast as you can while being accurate. <br/><br/><br/><br/>" +
                     "Press the <b>space bar</b> when you are ready to start.</p>"
@@ -178,10 +189,10 @@
 
             const block_5 = {
                 type: jsPsychHtmlKeyboardResponse,
-                version:"",
+                choices: [" "],
                 stimulus: "<p><b>Watch out, the labels have changed position!</b> <br/><br/>" +
-                    "Use the left finger on the E key for <b>Artifacts</b>. <br/><br/>" +
-                    "Use the right finger on the I key for <b>Animals</b>. <br/><br/>" +
+                    `Use the left finger on the D key for <b>${category_displays[5][0]}</b>. <br/><br/>` +
+                    `Use the right finger on the K key for <b>${category_displays[5][1]}</b>. <br/><br/>` +
                     "If you make a mistake, a red X will appear. Press the other key to continue. Go as fast as you can while being accurate. <br/><br/><br/><br/>" +
                     "Press the <b>space bar</b> when you are ready to start.</p>"
             }
@@ -190,9 +201,9 @@
 
             const block_6 = {
                 type: jsPsychHtmlKeyboardResponse,
-                version:"",
-                stimulus: "<p>Use the E key for ‘Artifacts’ and for <b>Category 2 Words</b>. <br/><br/>" +
-                    "Use the I key for ‘Animals’ and for <b>Category 1 Words</b>. <br/><br/>" +
+                choices: [" "],
+                stimulus: `<p>Use the D key for <b>${category_displays[6][0][0]}</b> and for <b>${category_displays[6][0][1]}</b>. <br/><br/>` +
+                    `Use the K key for <b>${category_displays[6][1][0]}</b> and for <b>${category_displays[6][1][1]}</b>. <br/><br/>` +
                     "Each item belongs to only one category. <br/><br/>" +
                     "If you make a mistake, a red X will appear. Press the other key to continue. Go as fast as you can while being accurate. <br/><br/><br/><br/>" +
                     "Press the <b>space bar</b> when you are ready to start.</p>"
@@ -202,9 +213,9 @@
 
             const block_7 = {
                 type: jsPsychHtmlKeyboardResponse,
-                version:"",
-                stimulus: "<p>Use the E key for ‘Artifacts’ and for <b>Category 2 Words</b>. <br/><br/>" +
-                    "Use the I key for ‘Animals’ and for <b>Category 1 Words</b>. <br/><br/>" +
+                choices: [" "],
+                stimulus: `<p>Use the D key for <b>${category_displays[7][0][0]}</b> and for <b>${category_displays[7][0][1]}</b>. <br/><br/>` +
+                    `Use the K key for <b>${category_displays[7][1][0]}</b> and for <b>${category_displays[7][1][1]}</b>. <br/><br/>` +
                     "Each item belongs to only one category. <br/><br/>" +
                     "If you make a mistake, a red X will appear. Press the other key to continue. Go as fast as you can while being accurate. <br/><br/><br/><br/>" +
                     "Press the <b>space bar</b> when you are ready to start.</p>"
@@ -222,10 +233,10 @@
                 force_correct_key_press: true,
                 display_feedback: true,
                 trial_duration: 3000, //Only if display_feedback is false
-                left_category_key: 'e',
-                right_category_key: 'i',
-                left_category_label: ['CATEGORY 1'],
-                right_category_label: ['CATEGORY 2'],
+                left_category_key: 'd',
+                right_category_key: 'k',
+                left_category_label: category_displays[0][0],
+                right_category_label: category_displays[0][1],
                 response_ends_trial: true,
                 data:{
                     trial:jsPsych.timelineVariable('trial'),
@@ -250,10 +261,10 @@
                 force_correct_key_press: true,
                 display_feedback: true,
                 trial_duration: 3000, //Only if display_feedback is false
-                left_category_key: 'e',
-                right_category_key: 'i',
-                left_category_label: ['ANIMAL'],
-                right_category_label: ['ARTIFACT'],
+                left_category_key: 'd',
+                right_category_key: 'k',
+                left_category_label: category_displays[1][0],
+                right_category_label: category_displays[1][1],
                 response_ends_trial: true,
                 data:{
                     trial:jsPsych.timelineVariable('trial'),
@@ -278,10 +289,10 @@
                 force_correct_key_press: true,
                 display_feedback: true,
                 trial_duration: 3000, //Only if display_feedback is false
-                left_category_key: 'e',
-                right_category_key: 'i',
-                left_category_label: ['CATEGORY 1'],
-                right_category_label: ['CATEGORY 2'],
+                left_category_key: 'd',
+                right_category_key: 'k',
+                left_category_label: category_displays[2][0],
+                right_category_label: category_displays[2][1],
                 response_ends_trial: true,
                 data:{
                     trial:jsPsych.timelineVariable('trial'),
@@ -306,10 +317,10 @@
                 force_correct_key_press: true,
                 display_feedback: true,
                 trial_duration: 3000, //Only if display_feedback is false
-                left_category_key: 'e',
-                right_category_key: 'i',
-                left_category_label: ['CATEGORY 1','ANIMAL'],
-                right_category_label: ['CATEGORY 2','ARTIFACT'],
+                left_category_key: 'd',
+                right_category_key: 'k',
+                left_category_label: category_displays[3][0],
+                right_category_label: category_displays[3][1],
                 response_ends_trial: true,
                 data:{
                     trial:jsPsych.timelineVariable('trial'),
@@ -334,10 +345,10 @@
                 force_correct_key_press: true,
                 display_feedback: true,
                 trial_duration: 3000, //Only if display_feedback is false
-                left_category_key: 'e',
-                right_category_key: 'i',
-                left_category_label: ['CATEGORY 2','ARTIFACT'],
-                right_category_label: ['CATEGORY 1','ANIMAL'],
+                left_category_key: 'd',
+                right_category_key: 'k',
+                left_category_label: category_displays[4][0],
+                right_category_label: category_displays[4][1],
                 response_ends_trial: true,
                 data:{
                     trial:jsPsych.timelineVariable('trial'),
@@ -362,10 +373,10 @@
                 force_correct_key_press: true,
                 display_feedback: true,
                 trial_duration: 3000, //Only if display_feedback is false
-                left_category_key: 'e',
-                right_category_key: 'i',
-                left_category_label: ['CATEGORY 1','ANIMAL'],
-                right_category_label: ['CATEGORY 2','ARTIFACT'],
+                left_category_key: 'd',
+                right_category_key: 'k',
+                left_category_label: category_displays[5][0],
+                right_category_label: category_displays[5][1],
                 response_ends_trial: true,
                 data:{
                     trial:jsPsych.timelineVariable('trial'),
@@ -390,10 +401,10 @@
                 force_correct_key_press: true,
                 display_feedback: true,
                 trial_duration: 3000, //Only if display_feedback is false
-                left_category_key: 'e',
-                right_category_key: 'i',
-                left_category_label: ['CATEGORY 2','ARTIFACT'],
-                right_category_label: ['CATEGORY 1','ANIMAL'],
+                left_category_key: 'd',
+                right_category_key: 'k',
+                left_category_label: category_displays[6][0],
+                right_category_label: category_displays[6][1],
                 response_ends_trial: true,
                 data:{
                     trial:jsPsych.timelineVariable('trial'),
@@ -418,10 +429,10 @@
                 force_correct_key_press: true,
                 display_feedback: true,
                 trial_duration: 3000, //Only if display_feedback is false
-                left_category_key: 'e',
-                right_category_key: 'i',
-                left_category_label: ['CATEGORY 2','ARTIFACT'],
-                right_category_label: ['CATEGORY 1','ANIMAL'],
+                left_category_key: 'd',
+                right_category_key: 'k',
+                left_category_label: category_displays[7][0],
+                right_category_label: category_displays[7][1],
                 response_ends_trial: true,
                 data:{
                     trial:jsPsych.timelineVariable('trial'),
@@ -436,7 +447,7 @@
                 }
             };
 
-            const tests = [test_1,test_2,test_3,test_4,test_5,test_6,test_7,test_8]
+            const tests = [test_1, test_2, test_3, test_4, test_5, test_6, test_7, test_8]
 
             for (let i = 0; i < test_stimuli.length; i++) {
                 timeline.push(instructions[i]);
