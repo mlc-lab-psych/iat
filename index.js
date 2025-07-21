@@ -196,6 +196,10 @@ app.get('/get-data', (req, res) => {
                     }
                 }
             }
+            for (const block in category_display) {
+                category_display[block][0].sort(); // sort left
+                category_display[block][1].sort(); // sort right
+            }
         }).then((dataset) =>{
             res.status(200).json({
                 test_stimuli: test_stimuli,
