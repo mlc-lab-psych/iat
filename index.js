@@ -54,7 +54,8 @@ app.get('/get-data', (req, res) => {
         5: [[], []],
         6: [[], []],
         7: [[], []]
-    }
+    };
+    let category_word_image = "words_animate_Cat1.PNG"
 
     async function processCountData() {
         const dbRef = ref(database);
@@ -169,6 +170,12 @@ app.get('/get-data', (req, res) => {
             const sortedData = result.sort((a, b) => a.fields["trial"] - b.fields["trial"]);
             for(let rows in result){
 
+                if(result[rows].fields['stimulus'] === "inert"){
+                    if(result[rows].fields['correct_key'] === "d"){
+                        category_word_image = "words_animate_Cat2.PNG"
+                    }
+                }
+
                 if(result[rows].fields['stimulus_type'] === "image"){
                     images.push(result[rows].fields["stimulus"]);
                 }
@@ -204,7 +211,8 @@ app.get('/get-data', (req, res) => {
             res.status(200).json({
                 test_stimuli: test_stimuli,
                 images: images,
-                category_display: category_display
+                category_display: category_display,
+                category_word_image: category_word_image
             })
         })
     })
