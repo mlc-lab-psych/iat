@@ -5,6 +5,9 @@
     <title>IAT Experiment</title>
     <script src="https://unpkg.com/jspsych@8.0.0"></script>
     <link href="https://unpkg.com/jspsych@8.0.0/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <link rel="preload" as="image" href="words_animate_Cat1.PNG">
+    <link rel="preload" as="image" href="words_animate_Cat2.PNG">
+
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.3"></script>
@@ -74,10 +77,10 @@
                     images = result
                 })
 
-                test_stimuli = test_block_stimuli;
                 category_displays = data['category_display']
-
                 cat_img = data['category_word_image']
+
+                test_stimuli = test_block_stimuli;
 
                 initializeJsPsych();
 
@@ -496,6 +499,15 @@
                 };
                 timeline.push(test_procedure);
             }
+
+            const thanking = {
+                type: jsPsychHtmlKeyboardResponse,
+                choices: [" "],
+                stimulus: "<p>Thank you for completing the association task. You will now fill out a short questionnaire about yourself <br/><br/><br/><br/>" +
+                    "Press the <b>space bar</b> when you are ready to start.</p>"
+            };
+
+            timeline.push(thanking)
 
             const demographics = {
                 type: jsPsychSurveyHtmlForm,
