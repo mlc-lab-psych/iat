@@ -267,6 +267,8 @@
 
             instructions.push(block_7)
 
+            let time;
+
             const test_1 = {
                 type: jsPsychIatHtml,
                 stim_key_association: jsPsych.timelineVariable('association'),
@@ -291,7 +293,14 @@
                     category:jsPsych.timelineVariable('category'),
                     category_display:jsPsych.timelineVariable('category_display'),
                     stimulus:jsPsych.timelineVariable('stimulus'),
-                    correct_key:jsPsych.timelineVariable('correct_key')
+                    correct_key:jsPsych.timelineVariable('correct_key'),
+                },
+                on_start: function(test_1){
+                    time = Date.now()
+                },
+                on_finish: function(data){
+                    data['rt'] = Date.now() - time
+                    time = 0
                 }
             };
 
@@ -320,6 +329,13 @@
                     category_display:jsPsych.timelineVariable('category_display'),
                     stimulus:jsPsych.timelineVariable('stimulus'),
                     correct_key:jsPsych.timelineVariable('correct_key')
+                },
+                on_start: function(test_2){
+                    time = Date.now()
+                },
+                on_finish: function(data){
+                    data['rt'] = Date.now() - time
+                    time = 0
                 }
             };
 
@@ -348,6 +364,13 @@
                     category_display:jsPsych.timelineVariable('category_display'),
                     stimulus:jsPsych.timelineVariable('stimulus'),
                     correct_key:jsPsych.timelineVariable('correct_key')
+                },
+                on_start: function(test_3){
+                    time = Date.now()
+                },
+                on_finish: function(data){
+                    data['rt'] = Date.now() - time
+                    time = 0
                 }
             };
 
@@ -376,6 +399,13 @@
                     category_display:jsPsych.timelineVariable('category_display'),
                     stimulus:jsPsych.timelineVariable('stimulus'),
                     correct_key:jsPsych.timelineVariable('correct_key')
+                },
+                on_start: function(test_4){
+                    time = Date.now()
+                },
+                on_finish: function(data){
+                    data['rt'] = Date.now() - time
+                    time = 0
                 }
             };
 
@@ -404,6 +434,13 @@
                     category_display:jsPsych.timelineVariable('category_display'),
                     stimulus:jsPsych.timelineVariable('stimulus'),
                     correct_key:jsPsych.timelineVariable('correct_key')
+                },
+                on_start: function(test_5){
+                    time = Date.now()
+                },
+                on_finish: function(data){
+                    data['rt'] = Date.now() - time
+                    time = 0
                 }
             };
 
@@ -432,6 +469,13 @@
                     category_display:jsPsych.timelineVariable('category_display'),
                     stimulus:jsPsych.timelineVariable('stimulus'),
                     correct_key:jsPsych.timelineVariable('correct_key')
+                },
+                on_start: function(test_6){
+                    time = Date.now()
+                },
+                on_finish: function(data){
+                    data['rt'] = Date.now() - time
+                    time = 0
                 }
             };
 
@@ -460,6 +504,13 @@
                     category_display:jsPsych.timelineVariable('category_display'),
                     stimulus:jsPsych.timelineVariable('stimulus'),
                     correct_key:jsPsych.timelineVariable('correct_key')
+                },
+                on_start: function(test_7){
+                    time = Date.now()
+                },
+                on_finish: function(data){
+                    data['rt'] = Date.now() - time
+                    time = 0
                 }
             };
 
@@ -488,6 +539,13 @@
                     category_display:jsPsych.timelineVariable('category_display'),
                     stimulus:jsPsych.timelineVariable('stimulus'),
                     correct_key:jsPsych.timelineVariable('correct_key')
+                },
+                on_start: function(test_8){
+                    time = Date.now()
+                },
+                on_finish: function(data){
+                    data['rt'] = Date.now() - time
+                    time = 0
                 }
             };
 
