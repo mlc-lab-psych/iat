@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>IAT Experiment</title>
+    <title>IAT Animal Artifact Experiment</title>
     <script src="https://unpkg.com/jspsych@8.0.0"></script>
     <link href="https://unpkg.com/jspsych@8.0.0/css/jspsych.css" rel="stylesheet" type="text/css" />
 
@@ -110,7 +110,7 @@
                 }
             }
 
-            let subject_id = "alive_images_" + Math.floor(Math.random() * 1000000);
+            let subject_id = "iat_animal_artifact_" + Math.floor(Math.random() * 1000000);
             let worker_id = getParamFromURL('PROLIFIC_PID') || subject_id;
             let study_id = getParamFromURL('STUDY_ID') || "NULL";
             let session_id = getParamFromURL('SESSION_ID') || "NULL";
